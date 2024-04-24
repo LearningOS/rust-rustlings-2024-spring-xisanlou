@@ -2,11 +2,12 @@
 	double linked list reverse
 	This problem requires you to reverse a doubly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
+
 
 #[derive(Debug)]
 struct Node<T> {
@@ -74,6 +75,25 @@ impl<T> LinkedList<T> {
     }
 	pub fn reverse(&mut self){
 		// TODO
+        
+        let mut node = self.start;
+        
+        let mut next: Option<NonNull<Node<T>>> = None;
+        let mut prev: Option<NonNull<Node<T>>> = None;
+        while node != None {
+            if let Some(node_ptr) = node {
+                next = unsafe { (*node_ptr.as_ptr()).next };
+                prev = unsafe { (*node_ptr.as_ptr()).prev };
+                unsafe { (*node_ptr.as_ptr()).next = prev;}
+                unsafe { (*node_ptr.as_ptr()).prev = next;}
+            }
+            
+            node = next;
+        }
+
+        next = self.end;
+        self.end = self.start;
+        self.start = next; 
 	}
 }
 
