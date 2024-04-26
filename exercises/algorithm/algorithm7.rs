@@ -2,8 +2,9 @@
 	stack
 	This question requires you to use a stack to achieve a bracket match
 */
+use std::collections::HashMap;
 
-// I AM NOT DONE
+
 #[derive(Debug)]
 struct Stack<T> {
 	size: usize,
@@ -32,7 +33,13 @@ impl<T> Stack<T> {
 	}
 	fn pop(&mut self) -> Option<T> {
 		// TODO
-		None
+		match self.data.pop() {
+			Some(T) => {
+				self.size -= 1;
+				return Some(T);
+			},
+			None => {return None;},
+		}
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
@@ -102,7 +109,43 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 fn bracket_match(bracket: &str) -> bool
 {
 	//TODO
-	true
+	let mut stack = Stack::<String>::new();
+	let mut map_left = HashMap::new();
+	map_left.insert(String::from("{"),String::from("}"));
+	map_left.insert(String::from("["),String::from("]"));
+	map_left.insert(String::from("("),String::from(")"));
+
+	let mut map_right = HashMap::new();
+	map_right.insert(String::from("}"),String::from("{"));
+	map_right.insert(String::from("]"),String::from("["));
+	map_right.insert(String::from(")"),String::from("("));
+
+	for it in bracket.chars() {
+		let c2s = it.to_string();
+		let ss_l = map_left.get(&c2s);
+		let ss_r = map_right.get(&c2s);
+
+		if let Some(b) = ss_l {
+			stack.push(c2s.clone());
+		} else if let Some(c) = ss_r {
+			if stack.len() == 0 {
+				return false;
+			}
+
+			let s1 = stack.pop().unwrap();
+			if *c != s1 {
+				return false;
+			}
+		} else {
+
+		}
+	}
+
+	if stack.len() == 0 {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 #[cfg(test)]

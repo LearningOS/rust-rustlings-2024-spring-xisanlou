@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,6 +37,19 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+        self.count += 1;
+
+        let mut index = self.len();
+        
+        while index > 1 {
+            let parent_index = self.parent_idx(index);
+            if (self.comparator)(&(self.items[parent_index]), &(self.items[index])) {
+                break;
+            }
+            self.items.swap(parent_index, index);
+            index = parent_index;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +70,7 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		self.left_child_idx(idx)
     }
 }
 
@@ -85,7 +97,32 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.items.len() < 3 {
+            return None;
+        }
+        let last_index = self.items.len() -1;
+        self.items.swap(1, last_index);
+        let value = self.items.pop()?;
+        self.count -= 1;
+        if !self.is_empty() {
+            let mut index = 1;
+            let length = self.items.len();
+            
+            while self.left_child_idx(index) < length {
+                let mut left_child_index = self.left_child_idx(index);
+                let right_child_index = self.right_child_idx(index);
+                if right_child_index < length && (self.comparator)(&(self.items[right_child_index]), &(self.items[left_child_index])) {
+                    left_child_index = right_child_index;
+                }
+                if (self.comparator)(&(self.items[index]), &(self.items[left_child_index])) {
+                    break;
+                }
+
+                self.items.swap(index, left_child_index);
+                index = left_child_index;
+            }
+        }
+        Some(value)
     }
 }
 
@@ -127,8 +164,11 @@ mod tests {
         let mut heap = MinHeap::new();
         heap.add(4);
         heap.add(2);
+        println!("min_heap {:?}", heap.items);
         heap.add(9);
+        println!("min_heap {:?}", heap.items);
         heap.add(11);
+        println!("min_heap {:?}", heap.items);
         assert_eq!(heap.len(), 4);
         assert_eq!(heap.next(), Some(2));
         assert_eq!(heap.next(), Some(4));
@@ -142,8 +182,11 @@ mod tests {
         let mut heap = MaxHeap::new();
         heap.add(4);
         heap.add(2);
+        println!("max_heap {:?}", heap.items);
         heap.add(9);
+        println!("max_heap {:?}", heap.items);
         heap.add(11);
+        println!("max_heap {:?}", heap.items);
         assert_eq!(heap.len(), 4);
         assert_eq!(heap.next(), Some(11));
         assert_eq!(heap.next(), Some(9));
